@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="/static/index.css">
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <div class="header-slogan">
+        <div class="topslogan">
+            輕鬆享受台北一日悠閒
+        </div>
+        <div class="slogan">
+            探索每個角落，體驗城市的深度旅遊行程
+        </div>
+        <div class="form">
+            <input type="search" id="keyword" placeholder="輸入景點名稱查詢" onclick="showcat()">
+            <button type="submit" class="search" onclick="search()"></button>
+        </div>
+        <div class="pin">
+            <ul class="catelist" id="drop"></ul>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="titlelist"></div>
+</div>
+<div class="footer">COPYRIGHT © 2022 台北一日遊</div>
+
+<script>
+    
+    //logstate
+    let origin = window.location.origin;
+    fetch(origin + "/api/user/auth").then(function (response) {
+        return response.json();
+    }).then(function (data) {
+        if (document.cookie != "") {
+            document.getElementById("navsign").style.display = "none";
+            document.getElementById("memberpage").style.display = "inline-block";
+        }
+    });
+    // showcategories
+    function showcat() {
+        document.getElementById("drop").classList.toggle("show");
+    }
+
+    //click:show/hide
+    window.onclick = function (e) {
+        if (!e.target.matches('input')) {
+            let myDropdown = document.getElementById("drop");
+            if (myDropdown.classList.contains('show')) {
+                myDropdown.classList.remove('show');
+            }
+        }
+    }
+
+    //IntersectionObserver
+    let observer = new IntersectionObserver(callback);
+    let target = document.querySelector('.footer');
+    observer.unobserve(target);
+    setTimeout(() => { observer.observe(target); }, 1000);
+    function callback(entry) {
+        if (entry[0].isIntersecting != isLoading) {
+            getIndex();
+        }
+    }
+
+
+    //search
+    function search() {
+        observer.unobserve(target);
+        page = 0;
+        document.getElementsByClassName("titlelist")[0].innerHTML = "";
+        getIndex();
+    }
+
+    
+    // getattractions
+    let isLoading = false;
+    let page = 0;
+    function getIndex() {
+        document.getElementById("loading").style.display = "block";
+        
+        if (document.getElementById('keyword').value === "") {
+            url = origin + "/api/attractions?page=" + page;
+        } else {
+            url = origin + "/api/attractions?page=" + page + "&keyword=" + document.getElementById('keyword').value;
+        }
+        isLoading = true;
+        fetch(url).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            for (i = 0; i < data.data.length; i++) {
+                let newdiv = document.createElement("div");
+                newdiv.setAttribute("class", "title");
+
+                let attractionlink = document.createElement("a");
+                attractionlink.href = "/attraction/" + data.data[i].id;
+                newdiv.appendChild(attractionlink);
+
+                let imgdiv = document.createElement("div");
+                imgdiv.setAttribute("class", "img");
+                attractionlink.appendChild(imgdiv);
+
+                let img = document.createElement("img");
+                img.src = data.data[i].images[0];
+                img.setAttribute("class", "images");
+
+                imgdiv.appendChild(img);
+
+                let name = document.createElement("p");
+                name.textContent = data.data[i].name;
+                imgdiv.appendChild(name);
+
+                let mrt_name = document.createElement("ul");
+                mrt_name.setAttribute("class", "mrt-cat");
+                attractionlink.appendChild(mrt_name);
+
+                let mrt = document.createElement("li");
+                mrt.textContent = data.data[i].mrt;
+                mrt_name.appendChild(mrt);
+
+                let cate = document.createElement("li");
+                cate.textContent = data.data[i].category;
+                mrt_name.appendChild(cate);
+                document.getElementsByClassName("titlelist")[0].appendChild(newdiv);
+            }
+            page++
+            if (data.nextpage === null) {
+                observer.unobserve(target);
+                document.getElementById('keyword').value = "";
+            }
+            else {
+                observer.observe(target);
+            }
+        });
+        isLoading = false;
+        document.getElementById("loading").style.display = "none";
+    }
+    getIndex();
+
+    // getcategories
+    fetch(origin + "/api/categories").then(function (response) {
+        return response.json();
+    }).then(function (data) {
+        for (let i = 0; i < data.data.length; i++) {
+            let cat = document.createElement("li");
+            cat.textContent = data.data[i];
+            document.getElementsByClassName("catelist")[0].appendChild(cat);
+            cat.onclick = function getsearch() {
+                document.getElementById('keyword').value = cat.textContent;
+            }
+        };
+
+    });
+    
+</script>
+{% endblock %}

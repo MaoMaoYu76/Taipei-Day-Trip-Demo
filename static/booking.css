@@ -1,0 +1,157 @@
+input {
+    line-height: 38px;
+    width: 200px;
+    margin: 7px 0;
+}
+
+button {
+    width: 175px;
+    height: 35px;
+    font-size: 19px;
+    color: #FFFFFF;
+    margin: 5px auto;
+    border: 0px;
+    background-color: #448899;
+    border-radius: 5px;
+    font-size: 19px;
+}
+
+a{
+    width: 25%;
+    height: 20%;
+}
+
+
+
+hr {
+    margin: 45px 0;
+}
+
+.main {
+    margin: 15px auto;
+    max-width: 1200px;
+}
+
+
+.welcome {
+    font-weight: 700;
+    font-size: 19px;
+    margin: 35px 0;
+}
+
+.attraction {
+    display: flex;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.attractionpic {
+    width: 100%;
+    height: 200px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+.attraction_message {
+    margin: 0 20px;
+}
+
+.attraction_message span {
+    line-height: 1.8em;
+
+}
+
+.booking_title {
+    font-weight: 700;
+    color: #448899;
+    margin: 0 0 30px 0;
+}
+
+.delete {
+    display: inline;
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+}
+
+.form_title {
+    font-size: 19px;
+    font-weight: 700;
+    margin: 45px 0 25px 0;
+}
+
+.list {
+    font-weight: 700;
+}
+
+.notice {
+    font-weight: 700;
+    margin: 20px 0;
+}
+
+.pay {
+    float: right;
+    margin-bottom: 60px;
+}
+
+.tpfield {
+    height: 40px;
+    width: 200px;
+    border: 1px solid #CCCCCC;
+    margin: 5px 0;
+    padding: 0 15px;
+    border-radius: 5px;
+    color: #757575;
+    line-height: 38px;
+    /* display: inline-block; */
+}
+
+.paymeg{
+    display: flex;
+}
+
+.cardmeg{
+    display: flex;
+    align-content: center;
+    flex-wrap:wrap;
+    padding: 0 5px 0 0 ;
+}
+
+#alert{
+    color: red;
+    font-weight: 700;
+}
+
+@media(max-width:1220px) {
+    .main {
+        width: 90%;
+    }
+
+    a{
+        width: 35%;
+        height: 30%;
+    }
+}
+
+@media(max-width:600px) {
+    .attraction {
+        display: block;
+    }
+    .attractionpic {
+        width: 100%;
+        height: 40vh;
+        object-fit: cover;
+    }
+    .delete {
+        bottom: 0;
+        top: auto;
+    }
+    .attraction_message {
+        margin: auto;
+    }
+    .attraction_message span {
+        line-height: 2em;
+    }
+
+}

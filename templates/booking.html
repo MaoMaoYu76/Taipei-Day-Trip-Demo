@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="/static/booking.css">
+<script src="https://js.tappaysdk.com/sdk/tpdirect/v5.14.0"></script>
+{% endblock %}
+
+{% block content %}
+<div class="main">
+    <div class="welcome"></div>
+    <hr>
+    <div class="contact_pay">
+        <div class="form_title">您的聯絡資訊</div>
+        <form onsubmit="return onSubmit(event)" id="form">
+            <label for="contactperson">聯絡姓名：</label>
+            <input type="text" pattern="^[\u4e00-\u9fa5a-zA-Z0-9]{0,15}$" title="只能包含中文、英文和数字，且長度不能超過 15 個字符"
+                id="contactperson" required onclick="this.select()"><br>
+            <label for="contactemail">連絡信箱：</label>
+            <input type="text" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" title="電子信箱格式有誤" required
+                id="contactemail" onclick="this.select()"><br>
+            <label for="contactphone">手機號碼：</label>
+            <input type="text" pattern="^09\d{2}-?\d{3}-?\d{3}$" title="手機號碼格式有誤" required id="contactphone" onclick="this.select()"><br>
+        </form>
+        <div class="notice">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。</div>
+
+        <hr>
+        <div class="form_title">信用卡付款資訊</div>
+        <div class="paymeg">
+            <div class="cardmeg">卡片號碼：</div>
+            <div class="tpfield" id="card-number"></div>
+        </div>
+        <div class="paymeg">
+            <span class="cardmeg">過期時間：</span>
+            <div class="tpfield" id="card-expiration-date"></div>
+        </div>
+        <div class="paymeg">
+            <span class="cardmeg">驗證密碼：</span>
+            <div class="tpfield" id="card-ccv" type="password"></div>
+        </div>
+        <hr>
+        <div class="pay">
+            <div id="alert"></div>
+            <div class="notice" id="total"></div>
+            <button type="submit" form="form">確認訂購並付款</button>
+        </div>
+    </div>
+</div>
+<div class="footer">COPYRIGHT © 2022 台北一日遊</div>
+<script>
+    TPDirect.setupSDK(126861, 'app_ZdUf0FzQgnt9Si7i5iPiOB44jpvTIoIXRiQOweIZsrQmxC5OeLkPR6M46yWW', 'sandbox')
+
+    TPDirect.card.setup({
+        fields: {
+            number: {
+                // css selector
+                element: '#card-number',
+                placeholder: '**** **** **** ****'
+            },
+            expirationDate: {
+                // DOM object
+                element: document.getElementById('card-expiration-date'),
+                placeholder: 'MM / YY'
+            },
+            ccv: {
+                element: '#card-ccv',
+                placeholder: 'ccv'
+            }
+        },
+        styles: {
+            // Style all elements
+            'input': {
+                'color': 'gray'
+            },
+            // Styling ccv field
+            'input.ccv': {
+                // 'font-size': '16px'
+            },
+            // Styling expiration-date field
+            'input.expiration-date': {
+                // 'font-size': '16px'
+            },
+            // Styling card-number field
+            'input.card-number': {
+                // 'font-size': '16px'
+            },
+            // style focus state
+            ':focus': {
+                'color': 'black'
+            },
+            // style valid state
+            '.valid': {
+                'color': 'green'
+            },
+            // style invalid state
+            '.invalid': {
+                'color': 'red'
+            },
+            // Media queries
+            // Note that these apply to the iframe, not the root window.
+            '@media screen and (max-width: 400px)': {
+                'input': {
+                    'color': 'orange'
+                }
+            }
+        },
+        // 此設定會顯示卡號輸入正確後，會顯示前六後四碼信用卡卡號
+        isMaskCreditCardNumber: true,
+        maskCreditCardNumberRange: {
+            beginIndex: 6,
+            endIndex: 11
+        }
+    })
+
+
+
+    fetch(origin + "/api/booking").then(function (response) {
+        return response.json();
+    }).then(function (data) {
+        document.getElementById("loading").style.display = "block";
+
+        if (data.data == "" || data.data == undefined) {
+            document.getElementsByClassName("contact_pay")[0].style.display = "none";
+            let attraction = document.createElement("div");
+            attraction.textContent = "目前還沒有任何預定的景點唷！";
+            attraction.setAttribute("class", "attraction");
+            let main = document.getElementsByClassName("main")[0];
+            main.insertBefore(attraction, main.children[1]);
+        }
+        total = 0;
+        for (i = 0; i < data.data.length; i++) {
+
+            let attraction = document.createElement("div");
+            attraction.setAttribute("class", "attraction");
+            attraction.appendChild(document.createElement("hr"));
+
+            let link = document.createElement("a");
+            link.href = "/attraction/" + data.data[i].attraction["id"];
+            attraction.appendChild(link);
+
+            let img = document.createElement("img");
+            img.src = data.data[i].attraction["image"];
+            img.setAttribute("class", "attractionpic");
+            link.appendChild(img);
+
+            let attraction_message = document.createElement("div");
+            attraction_message.setAttribute("class", "attraction_message");
+            let booking_title = document.createElement("div");
+            booking_title.setAttribute("class", "booking_title");
+            booking_title.textContent = "台北一日遊：" + data.data[i].attraction["name"];
+            attraction_message.appendChild(booking_title);
+
+            let date = document.createElement("span");
+            date.setAttribute("class", "list");
+            date.textContent = "日期： ";
+            let date1 = document.createElement("span");
+            bookingdate = new Date(data.data[i].date).toISOString();
+            date1.textContent = bookingdate.split("T")[0];
+            attraction_message.appendChild(date);
+            attraction_message.appendChild(date1);
+            attraction_message.appendChild(document.createElement("br"));
+
+            let time = document.createElement("span");
+            time.setAttribute("class", "list");
+            time.textContent = "時間： ";
+            let time1 = document.createElement("span");
+            data.data[i].time == "morning" ?
+                time1.textContent = "早上九點至十二點" :
+                time1.textContent = "下午一點至四點";
+            attraction_message.appendChild(time);
+            attraction_message.appendChild(time1);
+            attraction_message.appendChild(document.createElement("br"));
+
+            let price = document.createElement("span");
+            price.setAttribute("class", "list");
+            price.textContent = "費用： ";
+            let price1 = document.createElement("span");
+            price1.textContent = "新台幣" + data.data[i].price + "元";
+            total += data.data[i].price;
+            attraction_message.appendChild(price);
+            attraction_message.appendChild(price1);
+            attraction_message.appendChild(document.createElement("br"));
+
+            let locate = document.createElement("span");
+            locate.setAttribute("class", "list");
+            locate.textContent = "地點： ";
+            let locate1 = document.createElement("span");
+            locate1.textContent = data.data[i].attraction["address"];
+            attraction_message.appendChild(locate);
+            attraction_message.appendChild(locate1);
+            attraction_message.appendChild(document.createElement("br"));
+
+            let trashcan = document.createElement("img");
+            trashcan.src = "/static/images/icon_delete.png";
+            trashcan.setAttribute("onclick", "deletetrip(" + data.data[i].trip_id + ")");
+            trashcan.setAttribute("class", "delete");
+            attraction.appendChild(trashcan);
+
+            attraction.appendChild(attraction_message);
+            let main = document.getElementsByClassName("main")[0];
+            main.insertBefore(attraction, main.children[1]);
+        }
+        document.getElementById("total").innerHTML = "總價：新台幣 " + total + " 元";
+        document.getElementById("loading").style.display = "none";
+    });
+
+    function deletetrip(id) {
+        fetch(origin + "/api/booking", {
+            headers: {
+                "Content-Type": "application/json"
+            },
+            method: "DELETE",
+            body: JSON.stringify({
+                "id": id
+            })
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            if (data["ok"] === true) {
+                location.reload();
+            }
+        })
+    }
+    //logstate
+    fetch(origin + "/api/user/auth").then(function (response) {
+        return response.json();
+    }).then(function (data) {
+        if (document.cookie != "") {
+            document.getElementsByClassName("welcome")[0].innerHTML = "您好，" + data.data.name + "，您的預定行程如下："
+            document.getElementById("navsign").style.display = "none";
+            document.getElementById("memberpage").style.display = "inline-block";
+            document.getElementById("contactperson").value = data.data.name;
+            document.getElementById("contactemail").value = data.data.email;
+            document.getElementById("contactphone").value = data.data.phone;
+
+        }
+        else {
+            document.location.href = origin + "/";
+        }
+    });
+
+    TPDirect.card.getTappayFieldsStatus()
+    function onSubmit(event) {
+        event.preventDefault();
+        const tappayStatus = TPDirect.card.getTappayFieldsStatus()
+
+        // 確認是否可以 getPrime
+        if (tappayStatus.canGetPrime === false) {
+            document.getElementById("alert").textContent = "※請確認信用卡資訊是否正確或遺漏";
+        }
+        // Get prime
+        TPDirect.card.getPrime((result) => {
+            if (result.status == 0) {
+                fetch(origin + "/api/orders", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: "POST",
+                    body: JSON.stringify({
+                        "prime": result.card.prime,
+                        "contact": {
+                            "name": document.getElementById("contactperson").value,
+                            "email": document.getElementById("contactemail").value,
+                            "phone": document.getElementById("contactphone").value
+                        }
+                    })
+                }).then(function (response) {
+                    return response.json();
+                }).then(function (data) {
+
+                    if (data.data.payment == 1) {
+                        document.location.href = origin + "/thankyou?number=" + data.data.number;
+                    }
+                })
+            }
+        })
+    }
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+    .meg{
+        font-size: 24px;
+        font-weight: 700;
+        margin: 45px 0;
+        display: flex;
+        justify-content: center;
+    }
+    .number{
+        font-size: 24px;
+        display: flex;
+        justify-content: center;
+        margin: 45px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="meg">行程預定成功，您的訂單編號如下：</div>
+<div class="number"></div>
+<div class="footer">COPYRIGHT © 2022 台北一日遊</div>
+<script>
+    let url = origin + "/api/order/"+window.location.search.split("number=")[1].replace(/\D/g, "");
+    
+    fetch(url).then(function (response) {
+        return response.json();
+    }).then(function (data) {
+        document.getElementsByClassName("number")[0].innerHTML = data.data.number
+    })
+
+    fetch(origin + "/api/user/auth").then(function (response) {
+        return response.json();
+    }).then(function (data) {
+        if (document.cookie != "") {
+            document.getElementById("navsign").style.display = "none";
+            document.getElementById("memberpage").style.display = "inline-block";
+        }
+    });
+</script>
+{% endblock %}

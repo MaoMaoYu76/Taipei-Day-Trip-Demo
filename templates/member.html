@@ -1,0 +1,344 @@
+{% extends 'base.html' %} {% block head %}
+<link rel="stylesheet" type="text/css" href="/static/member.css" />
+{% endblock %} {% block content %}
+<div class="member">
+  <div class="leftside">
+    <div class="personal">
+      <div class="content">
+        <form onsubmit="return uploadData(event)" enctype="multipart/form-data">
+          <div class="photo">
+            <img id="blah" alt="your image" />
+            <div class="photomeg">
+              <div id="photoname" class="oldmeg"></div>
+              <input
+                class="update"
+                id="newname"
+                type="text"
+                pattern="^[\u4e00-\u9fa5a-zA-Z0-9]{0,15}$"
+                title="只能包含中文、英文和数字，且長度不能超過 15 個字符"
+                onclick="this.select()"
+                required
+              />
+            </div>
+          </div>
+          <input
+            accept=".png, .jpg, .jpeg"
+            type="file"
+            id="imgInp"
+            name="file"
+            class="update"
+            title="檔案格式只接受png／jpg／jpeg"
+          />
+          <div id="warning"></div>
+          <div class="information">
+            <div class="contact">
+              <img class="icon" src="/static/images/email.png" alt="" />
+              <span id="oldemail" class="oldmeg"></span>
+              <input
+                class="update"
+                id="newemail"
+                type="text"
+                pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                title="電子信箱格式有誤"
+                onclick="this.select()"
+                required
+              />
+            </div>
+            <div class="contact">
+              <img class="icon" src="/static/images/phone.png" alt="" />
+              <span id="phone" class="oldmeg"></span>
+              <input
+                class="update"
+                id="newphone"
+                type="text"
+                pattern="^09\d{2}-?\d{3}-?\d{3}$"
+                title="手機號碼格式有誤"
+                onclick="this.select()"
+                required
+              />
+            </div>
+          </div>
+          <p class="button">
+            <button id="update" class="update" type="submit">儲存更動</button>
+          </p>
+        </form>
+        <p class="button">
+          <button id="renew" class="oldmeg" onclick="renew()">修改資料</button>
+        </p>
+        <p class="button">
+          <button id="cancel" class="update" onclick="cancel()">取消</button>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="item">歷史訂單</div>
+    <hr />
+    <table id="hostory_order">
+      <tr>
+        <th class="thtitle">訂單標號</th>
+        <th>金額</th>
+        <th>聯絡人</th>
+        <th>聯絡手機</th>
+        <th>聯絡信箱</th>
+      </tr>
+    </table>
+  </div>
+</div>
+<script>
+  imgInp.onchange = (evt) => {
+    const [file] = imgInp.files;
+    if (file) {
+      blah.src = URL.createObjectURL(file);
+    }
+  };
+  let src;
+  let origin = window.location.origin;
+  fetch(origin + "/api/user/auth")
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (data) {
+      if (document.cookie != "") {
+        src = "/static/images/" + data.data.pic;
+        document.getElementById("blah").src = src;
+        document.getElementById("navsign").style.display = "none";
+        document.getElementById("logout").style.display = "inline-block";
+        document.getElementById("photoname").textContent = data.data.name;
+        document.getElementById("oldemail").textContent = data.data.email;
+        data.data.phone == 0
+          ? (document.getElementById("phone").textContent = "尚未設定")
+          : (document.getElementById("phone").textContent = data.data.phone);
+      } else {
+        document.location.href = origin + "/";
+      }
+    });
+
+  fetch(origin + "/api/member")
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (data) {
+      document.getElementById("loading").style.display = "block";
+      if (data.error == true) {
+        let tr = document.createElement("tr");
+        let td = document.createElement("td");
+        td.setAttribute("colspan", "5");
+        td.setAttribute("class", "notrip");
+        td.textContent = data.message;
+        tr.appendChild(td);
+        document.getElementById("hostory_order").appendChild(tr);
+      } else {
+        for (let i = 0; i < data.data.orders.length; i++) {
+          let tr = document.createElement("tr");
+
+          let td = document.createElement("td");
+          let a = document.createElement("a");
+          a.setAttribute("class", "number");
+          a.textContent = data.data.orders[i].number;
+          a.addEventListener(
+            "click",
+            (function (t) {
+              return function (event) {
+                event.preventDefault();
+                extend(t);
+              };
+            })(a.textContent)
+          );
+          td.appendChild(a);
+          tr.appendChild(td);
+
+          let td1 = document.createElement("td");
+          td1.textContent = data.data.orders[i].price + "元";
+          tr.appendChild(td1);
+
+          let td2 = document.createElement("td");
+          td2.textContent = data.data.orders[i].person;
+          tr.appendChild(td2);
+
+          let td3 = document.createElement("td");
+          td3.textContent = data.data.orders[i].phone;
+          tr.appendChild(td3);
+
+          let td4 = document.createElement("td");
+          td4.textContent = data.data.orders[i].email;
+          tr.appendChild(td4);
+
+          document.getElementById("hostory_order").appendChild(tr);
+        }
+      }
+      document.getElementById("loading").style.display = "none";
+    });
+
+  function extend(t) {
+    target = event.target.parentNode.parentNode;
+    children = target.parentNode.childNodes;
+    let index = Array.prototype.indexOf.call(children, target);
+    orderid = document.getElementsByClassName(t);
+    if (orderid.length === 0) {
+      fetch(origin + "/api/memberorder?number=" + t)
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          for (let i = 0; i < data.data.length; i++) {
+            let sighttr = document.createElement("tr");
+            trclass = "trshow " + t;
+            sighttr.setAttribute("class", trclass);
+
+            let td = document.createElement("td");
+            sighttr.appendChild(td);
+
+            let link = document.createElement("a");
+            link.href = "/attraction/" + data.data[i].attraction["id"];
+            td.appendChild(link);
+
+            let img = document.createElement("img");
+            img.src = data.data[i].attraction["image"];
+            img.setAttribute("class", "attractionpic");
+            link.appendChild(img);
+
+            let td1 = document.createElement("td");
+            td1.setAttribute("colspan", "4");
+            sighttr.appendChild(td1);
+
+            let attraction_message = document.createElement("div");
+            attraction_message.setAttribute("class", "attraction_message");
+            let booking_title = document.createElement("div");
+            booking_title.setAttribute("class", "booking_title");
+            booking_title.textContent =
+              "台北一日遊：" + data.data[i].attraction["name"];
+            attraction_message.appendChild(booking_title);
+
+            let date = document.createElement("span");
+            date.setAttribute("class", "ordermeg");
+            date.textContent = "日期： ";
+            let date1 = document.createElement("span");
+            bookingdate = new Date(data.data[i].date).toISOString();
+            date1.textContent = bookingdate.split("T")[0];
+            attraction_message.appendChild(date);
+            attraction_message.appendChild(date1);
+            attraction_message.appendChild(document.createElement("br"));
+
+            let time = document.createElement("span");
+            time.setAttribute("class", "ordermeg");
+            time.textContent = "時間： ";
+            let time1 = document.createElement("span");
+            data.data[i].time == "morning"
+              ? (time1.textContent = "早上九點至十二點")
+              : (time1.textContent = "下午一點至四點");
+            attraction_message.appendChild(time);
+            attraction_message.appendChild(time1);
+            attraction_message.appendChild(document.createElement("br"));
+
+            let price = document.createElement("span");
+            price.setAttribute("class", "ordermeg");
+            price.textContent = "費用： ";
+            let price1 = document.createElement("span");
+            price1.textContent = "新台幣" + data.data[i].price + "元";
+            total = data.data[i].price;
+            attraction_message.appendChild(price);
+            attraction_message.appendChild(price1);
+            attraction_message.appendChild(document.createElement("br"));
+
+            let locate = document.createElement("span");
+            locate.setAttribute("class", "ordermeg");
+            locate.textContent = "地點： ";
+            let locate1 = document.createElement("span");
+            locate1.textContent = data.data[i].attraction["address"];
+            attraction_message.appendChild(locate);
+            attraction_message.appendChild(locate1);
+            attraction_message.appendChild(document.createElement("br"));
+
+            td1.appendChild(attraction_message);
+            table = document.getElementById("hostory_order");
+            table.insertBefore(sighttr, table.children[index]);
+          }
+          for (let i = 0; i < orderid.length; i++) {
+            orderid[i].style.display = "table-row";
+          }
+        });
+    } else if (orderid.length > 0 && orderid[1].style.display === "none") {
+      for (let i = 0; i < orderid.length; i++) {
+        orderid[i].style.display = "table-row";
+      }
+    } else {
+      for (let i = 0; i < orderid.length; i++) {
+        orderid[i].style.display = "none";
+      }
+    }
+  }
+
+  let oldmeg = document.getElementsByClassName("oldmeg");
+  let newmeg = document.getElementsByClassName("update");
+  function renew() {
+    for (let i = 0; i < oldmeg.length; i++) {
+      oldmeg[i].style.display = "none";
+    }
+
+    for (let i = 0; i < newmeg.length; i++) {
+      newmeg[i].style.display = "block";
+    }
+    newmeg[0].value = oldmeg[0].textContent;
+    newmeg[2].value = oldmeg[1].textContent;
+    newmeg[3].value = oldmeg[2].textContent;
+  }
+
+  function cancel() {
+    document.getElementById("blah").src = src;
+    for (let i = 0; i < oldmeg.length; i++) {
+      oldmeg[i].style.display = "block";
+    }
+
+    for (let i = 0; i < newmeg.length; i++) {
+      newmeg[i].style.display = "none";
+    }
+  }
+
+  function uploadData(event) {
+    event.preventDefault();
+    let newname = document.getElementById("newname").value;
+    let newemail = document.getElementById("newemail").value;
+    let newphone = document.getElementById("newphone").value;
+    let imgInp = document.getElementById("imgInp");
+
+    const formData = new FormData();
+    formData.append("file", imgInp.files[0]);
+
+    if (imgInp.files[0] != null) {
+      if (
+        imgInp.files[0].type == "image/jpeg" ||
+        imgInp.files[0].type == "image/jpg" ||
+        imgInp.files[0].type == "image/png"
+      ) {
+        fetch(origin + "/api/member", {
+          method: "POST",
+          body: formData,
+        });
+      } else {
+        document.getElementById("warning").textContent = "※檔案未符合格式";
+      }
+    }
+
+    fetch(origin + "/api/member", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "PATCH",
+      body: JSON.stringify({
+        name: newname,
+        email: newemail,
+        phone: newphone,
+      }),
+    })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        if (data["ok"] === true) {
+          location.reload();
+        }
+      });
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,318 @@
+* {
+    box-sizing: border-box;
+    font-family: 'Noto Sans TC';
+    margin: 0;
+    padding: 0;
+    position: relative;
+    color: #666666;
+}
+#loading{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 6;
+    background-color: #FFFFFF;
+    display: none;
+}
+.sk-folding-cube {
+    margin: 50vh auto;
+    width: 40px;
+    height: 40px;
+    position: relative;
+    -webkit-transform: rotateZ(45deg);
+            transform: rotateZ(45deg);
+  }
+  
+  .sk-folding-cube .sk-cube {
+    float: left;
+    width: 50%;
+    height: 50%;
+    position: relative;
+    -webkit-transform: scale(1.1);
+        -ms-transform: scale(1.1);
+            transform: scale(1.1); 
+  }
+  .sk-folding-cube .sk-cube:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #66AABB;
+    -webkit-animation: sk-foldCubeAngle 2.4s infinite linear both;
+            animation: sk-foldCubeAngle 2.4s infinite linear both;
+    -webkit-transform-origin: 100% 100%;
+        -ms-transform-origin: 100% 100%;
+            transform-origin: 100% 100%;
+  }
+  .sk-folding-cube .sk-cube2 {
+    -webkit-transform: scale(1.1) rotateZ(90deg);
+            transform: scale(1.1) rotateZ(90deg);
+  }
+  .sk-folding-cube .sk-cube3 {
+    -webkit-transform: scale(1.1) rotateZ(180deg);
+            transform: scale(1.1) rotateZ(180deg);
+  }
+  .sk-folding-cube .sk-cube4 {
+    -webkit-transform: scale(1.1) rotateZ(270deg);
+            transform: scale(1.1) rotateZ(270deg);
+  }
+  .sk-folding-cube .sk-cube2:before {
+    -webkit-animation-delay: 0.3s;
+            animation-delay: 0.3s;
+  }
+  .sk-folding-cube .sk-cube3:before {
+    -webkit-animation-delay: 0.6s;
+            animation-delay: 0.6s; 
+  }
+  .sk-folding-cube .sk-cube4:before {
+    -webkit-animation-delay: 0.9s;
+            animation-delay: 0.9s;
+  }
+  @-webkit-keyframes sk-foldCubeAngle {
+    0%, 10% {
+      -webkit-transform: perspective(140px) rotateX(-180deg);
+              transform: perspective(140px) rotateX(-180deg);
+      opacity: 0; 
+    } 25%, 75% {
+      -webkit-transform: perspective(140px) rotateX(0deg);
+              transform: perspective(140px) rotateX(0deg);
+      opacity: 1; 
+    } 90%, 100% {
+      -webkit-transform: perspective(140px) rotateY(180deg);
+              transform: perspective(140px) rotateY(180deg);
+      opacity: 0; 
+    } 
+  }
+  
+  @keyframes sk-foldCubeAngle {
+    0%, 10% {
+      -webkit-transform: perspective(140px) rotateX(-180deg);
+              transform: perspective(140px) rotateX(-180deg);
+      opacity: 0; 
+    } 25%, 75% {
+      -webkit-transform: perspective(140px) rotateX(0deg);
+              transform: perspective(140px) rotateX(0deg);
+      opacity: 1; 
+    } 90%, 100% {
+      -webkit-transform: perspective(140px) rotateY(180deg);
+              transform: perspective(140px) rotateY(180deg);
+      opacity: 0; 
+    }
+  }
+
+ul {
+    list-style-type: none;
+    white-space: nowrap;
+    width: 100%;
+    display: flex;
+    Justify-content: space-between;
+}
+
+a {
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+li {
+    padding: 10px;
+    display: inline-block;
+}
+
+.barlist {
+    padding: 10px;
+    display: inline-block;
+    background-position: 100%;
+}
+
+.barlist:hover {
+    background-color: #a3cfdf;
+    transition: .3s ease;
+}
+
+
+
+button {
+    cursor: pointer;
+}
+
+input {
+    line-height: 46px;
+    width: 400px;
+    border: 1px solid #CCCCCC;
+    border-radius: 6px;
+    font-weight: 700;
+    padding: 0 15px;
+    color: #757575;
+
+}
+
+::placeholder {
+    padding: 15px 0;
+    border: #757575;
+}
+
+/* nav-bar */
+.desk-nav {
+    height: 54px;
+    position: sticky;
+    top: 0px;
+    background-color: #FFFFFF;
+    z-index: 5;
+    box-shadow: 0 0 10px #AAAAAA;
+}
+
+.nav-container {
+    margin: auto;
+    max-width: 1200px;
+    align-items: center;
+    height: 54px;
+
+    /*ul display*/
+    display: flex;
+    Justify-content: space-between;
+    list-style-type: none;
+}
+
+.nav-title {
+    font-size: 30px;
+    font-weight: 700;
+    color: #448899;
+}
+
+#padleft {
+    padding-left: 0;
+}
+
+/*signwidow*/
+.mask-box {
+    background: #000;
+    opacity: 0.25;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 6;
+    display: none;
+}
+
+.sign {
+    position: absolute;
+    background-color: #FFFFFF;
+    width: 340px;
+    z-index: 10;
+    border-radius: 6px;
+    box-shadow: 0px 4px 60px #AAAAAA;
+    top: 25vh;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+}
+
+.signbox {
+    padding: 15px;
+}
+
+.color {
+    Width: 340px;
+    Height: 10px;
+    border-radius: 6px 6px 0 0;
+    background: linear-gradient(270deg, #337788 0%, #66AABB 100%);
+}
+
+.signtitle {
+    font-size: 24px;
+    font-weight: 700;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.close {
+    background-image: url(/static/images/icon_close.png);
+    width: 16px;
+    height: 16px;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline;
+    border: none;
+    position: absolute;
+    right: 0;
+}
+
+.signinput {
+    width: 310px;
+    margin: 5px auto;
+    outline: none;
+    border-radius: 5px;
+
+}
+
+.psw {
+    ime-mode: disabled;
+}
+
+.signbutton {
+    width: 310px;
+    height: 47px;
+    font-size: 19px;
+    color: #FFFFFF;
+    margin: 5px auto;
+    border: 0px;
+    background-color: #448899;
+    border-radius: 5px;
+}
+
+
+.ok {
+    color: #66AABB;
+    font-weight: 700;
+    justify-content: center;
+    display: none;
+    margin: 15px;
+}
+
+.er {
+    color: red;
+    font-weight: 700;
+    justify-content: center;
+    display: none;
+    margin: 15px;
+}
+
+.signmeg {
+    justify-content: center;
+    display: flex;
+}
+
+.signmeg a {
+    color: #448899;
+}
+
+#memberpage {
+    display: none;
+}
+
+#logout {
+    display: none;
+}
+
+/*footer*/
+.footer {
+    background-color: #757575;
+    width: 100%;
+    height: 104px;
+    display: flex;
+    align-items: center;
+    Justify-content: center;
+    font-weight: 700;
+    color: #FFFFFF;
+}
+
+@media(max-width:1200px) {
+    .nav-container {
+        width: 90%;
+    }
+}
